@@ -1,9 +1,9 @@
-package com.example.gpricescope.ui.home;
+package com.example.gpricescope.ui.search;
 
 import java.util.HashMap;
 
 public class Countries {
-    public static final HashMap<String, String> codes = new HashMap<String, String>();
+    public static final HashMap<String, String> codes = new HashMap<>();
 
     static {
         codes.put("US", "United States");

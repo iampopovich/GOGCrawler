@@ -1,4 +1,4 @@
-package com.example.gpricescope.ui.home;
+package com.example.gpricescope.ui.search;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,8 +45,8 @@ public class PriceAdapter extends RecyclerView.Adapter<PriceAdapter.ViewHolder> 
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView countryTextView;
-        public TextView priceTextView;
+        public final TextView countryTextView;
+        public final TextView priceTextView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

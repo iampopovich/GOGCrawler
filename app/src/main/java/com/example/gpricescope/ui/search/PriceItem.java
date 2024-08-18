@@ -1,16 +1,14 @@
-package com.example.gpricescope.ui.home;
-
-import java.util.HashMap;
+package com.example.gpricescope.ui.search;
 
 public class PriceItem {
 
 
     private final String code;
-    private final String value;
+    private final Double value;
     private final String currency;
     private final static Countries country = new Countries();
 
-    public PriceItem(String code, String value, String currency) {
+    public PriceItem(String code, Double value, String currency) {
         this.code = code;
         this.value = value;
         this.currency = currency;
@@ -24,11 +22,11 @@ public class PriceItem {
         return currency;
     }
 
-    public String getValue() {
+    public Double getValue() {
         return value;
     }
 
     public String getPrice() {
-        return value + " " + currency;
+        return String.format("%.2f", value) + " " + currency;
     }
 }
