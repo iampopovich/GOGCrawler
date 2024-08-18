@@ -1,5 +1,8 @@
 package com.example.gpricescope.ui.search;
 
+import static android.content.Intent.getIntent;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +42,7 @@ public class SearchFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
         SearchViewModel searchViewModel =
                 new ViewModelProvider(this).get(SearchViewModel.class);
         requestQueue = Volley.newRequestQueue(requireContext());
@@ -57,6 +62,12 @@ public class SearchFragment extends Fragment {
                 return false;
             }
         });
+        Intent intent = requireActivity().getIntent();
+        if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
+            if ("text/plain".equals(intent.getType())) {
+                handleSendText(intent, binding.searchView);
+            }
+        }
         return root;
     }
 
@@ -68,7 +79,8 @@ public class SearchFragment extends Fragment {
 
     private void fetchPrices(String query) {
         prices.clear();
-        if (!query.startsWith("https://www.gog.com/")) Toast.makeText(getContext(), "Invalid URL", Toast.LENGTH_SHORT).show();
+        if (!query.startsWith("https://www.gog.com/"))
+            Toast.makeText(getContext(), "Invalid URL", Toast.LENGTH_SHORT).show();
         extractProductId(query);
     }
 
@@ -80,7 +92,7 @@ public class SearchFragment extends Fragment {
                     Matcher matcher = pattern.matcher(response);
                     while (matcher.find()) productId = matcher.group(1);
                     if (productId == null) {
-                        Toast.makeText(getContext(),"Invalid product id", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Invalid product id", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "Invalid product id");
                         return;
                     }
@@ -113,6 +125,13 @@ public class SearchFragment extends Fragment {
         }, error -> {
         });
         requestQueue.add(request);
+    }
 
+    private void handleSendText(Intent intent, SearchView searchView) {
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (sharedText != null && sharedText.startsWith("https://www.gog.com/") && sharedText.contains("/game/")) {
+            searchView.setQuery(sharedText, true);
+            fetchPrices(sharedText);
+        }
     }
 }
