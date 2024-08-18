@@ -25,7 +25,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +34,7 @@ public class SearchFragment extends Fragment {
     private RequestQueue requestQueue;
     private final List<PriceItem> prices = new ArrayList<>();
     private String productId;
+    private final String TAG = "SearchFragment";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -79,12 +79,16 @@ public class SearchFragment extends Fragment {
                     Pattern pattern = Pattern.compile(regex);
                     Matcher matcher = pattern.matcher(response);
                     while (matcher.find()) productId = matcher.group(1);
-                    if (productId == null) return;
+                    if (productId == null) {
+                        Toast.makeText(getContext(),"Invalid product id", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Invalid product id");
+                        return;
+                    }
                     for (String code : Countries.codes.keySet()) {
                         makeRequest("https://api.gog.com/products/" + productId + "/prices?countryCode=" + code + "&currency=USD");
                     }
-                    Log.d("productId", productId);
-                }, error -> Log.e("Error", error.toString()));
+                    Log.d(TAG, productId);
+                }, error -> Log.e(TAG, error.toString()));
         requestQueue.add(request);
     }
 
