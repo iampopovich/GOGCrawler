@@ -116,8 +116,8 @@ public class SearchFragment extends Fragment {
                         .getJSONObject(0);
                 prices.add(
                         new PriceItem(url.split("countryCode=")[1].split("&")[0],
-                                Integer.parseInt(result.getString("finalPrice").split(" ")[0]) / 100.00,
-                                result.getString("finalPrice").split(" ")[1]));
+                                Integer.parseInt(result.getString("finalPrice").split(" ")[0]) / 100.00));
+//                                result.getString("finalPrice").split(" ")[1]));
                 prices.sort(Comparator.comparing(PriceItem::getValue));
                 if (prices.size() > 7) prices.subList(7, prices.size()).clear();
                 binding.priceRecyclerView.getAdapter().notifyDataSetChanged();

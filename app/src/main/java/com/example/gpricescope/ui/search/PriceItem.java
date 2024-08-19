@@ -5,13 +5,17 @@ public class PriceItem {
 
     private final String code;
     private final Double value;
-    private final String currency;
+    private String currency;
     private final static Countries country = new Countries();
 
     public PriceItem(String code, Double value, String currency) {
         this.code = code;
         this.value = value;
         this.currency = currency;
+    }
+    public PriceItem(String code, Double value) {
+        this.code = code;
+        this.value = value;
     }
 
     public String getCountry() {
@@ -27,6 +31,6 @@ public class PriceItem {
     }
 
     public String getPrice() {
-        return String.format("%.2f", value) + " " + currency;
+        return String.format("%.2f USD", value);
     }
 }
