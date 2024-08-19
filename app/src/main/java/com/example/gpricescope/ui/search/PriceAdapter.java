@@ -53,5 +53,4 @@ public class PriceAdapter extends RecyclerView.Adapter<PriceAdapter.ViewHolder> 
             countryTextView = itemView.findViewById(R.id.countryTextView);
             priceTextView = itemView.findViewById(R.id.priceTextView);
         }
-    }
-}
+    }}

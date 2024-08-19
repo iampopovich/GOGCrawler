@@ -68,6 +68,9 @@ public class SearchFragment extends Fragment {
                 handleSendText(intent, binding.searchView);
             }
         }
+
+        binding.priceRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.priceRecyclerView.setAdapter(new PriceAdapter(getContext(), prices));
         return root;
     }
 
@@ -116,9 +119,8 @@ public class SearchFragment extends Fragment {
                                 Integer.parseInt(result.getString("finalPrice").split(" ")[0]) / 100.00,
                                 result.getString("finalPrice").split(" ")[1]));
                 prices.sort(Comparator.comparing(PriceItem::getValue));
-                if (prices.size() > 10) prices.subList(10, prices.size()).clear();
-                binding.priceRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                binding.priceRecyclerView.setAdapter(new PriceAdapter(getContext(), prices));
+                if (prices.size() > 7) prices.subList(7, prices.size()).clear();
+                binding.priceRecyclerView.getAdapter().notifyDataSetChanged();
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
