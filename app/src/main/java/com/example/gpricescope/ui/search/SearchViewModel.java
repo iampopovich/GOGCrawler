@@ -4,16 +4,22 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.List;
+
 public class SearchViewModel extends ViewModel {
 
-    private final MutableLiveData<String> mText;
+    private final MutableLiveData<List<PriceItem>> mPriceList;
 
     public SearchViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+        mPriceList = new MutableLiveData<>();
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public LiveData<List<PriceItem>> getPriceList() {
+        return mPriceList;
     }
+
+    public void setPrices(List<PriceItem> prices) {
+        mPriceList.setValue(prices);
+    }
+
 }

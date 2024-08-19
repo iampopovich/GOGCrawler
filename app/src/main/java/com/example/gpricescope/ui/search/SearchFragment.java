@@ -1,7 +1,5 @@
 package com.example.gpricescope.ui.search;
 
-import static android.content.Intent.getIntent;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,7 +26,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,13 +35,16 @@ public class SearchFragment extends Fragment {
     private RequestQueue requestQueue;
     private final List<PriceItem> prices = new ArrayList<>();
     private String productId;
+    private SearchViewModel searchViewModel;
     private final String TAG = "SearchFragment";
+    private final String FETCH_PRICE_REQUEST_TAG = "fetch_price_request";
+    private final String EXTRACT_PRODUCT_ID_REQUEST_TAG = "extract_product_id_request";
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        SearchViewModel searchViewModel =
-                new ViewModelProvider(this).get(SearchViewModel.class);
+        searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         requestQueue = Volley.newRequestQueue(requireContext());
 
         binding = FragmentSearchBinding.inflate(inflater, container, false);
@@ -78,9 +78,15 @@ public class SearchFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        requestQueue.stop();
+        requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
+        requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
     }
 
     private void fetchPrices(String query) {
+        requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
+        requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
+        prices.clear();
         prices.clear();
         if (!query.startsWith("https://www.gog.com/"))
             Toast.makeText(getContext(), "Invalid URL", Toast.LENGTH_SHORT).show();
@@ -104,6 +110,7 @@ public class SearchFragment extends Fragment {
                     }
                     Log.d(TAG, productId);
                 }, error -> Log.e(TAG, error.toString()));
+        request.setTag(EXTRACT_PRODUCT_ID_REQUEST_TAG);
         requestQueue.add(request);
     }
 
@@ -121,11 +128,13 @@ public class SearchFragment extends Fragment {
                 prices.sort(Comparator.comparing(PriceItem::getValue));
                 if (prices.size() > 7) prices.subList(7, prices.size()).clear();
                 binding.priceRecyclerView.getAdapter().notifyDataSetChanged();
+                searchViewModel.setPrices(prices);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
         }, error -> {
         });
+        request.setTag(FETCH_PRICE_REQUEST_TAG);
         requestQueue.add(request);
     }
 
