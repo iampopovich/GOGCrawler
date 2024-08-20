@@ -87,7 +87,6 @@ public class SearchFragment extends Fragment {
         requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
         requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
         prices.clear();
-        prices.clear();
         if (!query.startsWith("https://www.gog.com/"))
             Toast.makeText(getContext(), "Invalid URL", Toast.LENGTH_SHORT).show();
         extractProductId(query);
