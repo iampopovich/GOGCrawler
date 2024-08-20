@@ -33,7 +33,6 @@ public class SearchFragment extends Fragment {
 
     private FragmentSearchBinding binding;
     private RequestQueue requestQueue;
-    private final List<PriceItem> prices = new ArrayList<>();
     private String productId;
     private SearchViewModel searchViewModel;
     private final String TAG = "SearchFragment";
@@ -70,7 +69,7 @@ public class SearchFragment extends Fragment {
         }
 
         binding.priceRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.priceRecyclerView.setAdapter(new PriceAdapter(getContext(), prices));
+        binding.priceRecyclerView.setAdapter(new PriceAdapter(getContext(), searchViewModel.getPriceList()));
         return root;
     }
 
@@ -86,7 +85,7 @@ public class SearchFragment extends Fragment {
     private void fetchPrices(String query) {
         requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
         requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
-        prices.clear();
+        searchViewModel.clearPrices();
         if (!query.startsWith("https://www.gog.com/"))
             Toast.makeText(getContext(), "Invalid URL", Toast.LENGTH_SHORT).show();
         extractProductId(query);
@@ -120,14 +119,11 @@ public class SearchFragment extends Fragment {
                         .getJSONObject("_embedded")
                         .getJSONArray("prices")
                         .getJSONObject(0);
-                prices.add(
+                searchViewModel.addPrice(
                         new PriceItem(url.split("countryCode=")[1].split("&")[0],
                                 Integer.parseInt(result.getString("finalPrice").split(" ")[0]) / 100.00));
 //                                result.getString("finalPrice").split(" ")[1]));
-                prices.sort(Comparator.comparing(PriceItem::getValue));
-                if (prices.size() > 7) prices.subList(7, prices.size()).clear();
                 binding.priceRecyclerView.getAdapter().notifyDataSetChanged();
-                searchViewModel.setPrices(prices);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
