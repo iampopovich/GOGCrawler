@@ -23,9 +23,6 @@ import com.example.gpricescope.databinding.FragmentSearchBinding;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,6 +51,7 @@ public class SearchFragment extends Fragment {
                 fetchPrices(query);
                 return true;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -99,10 +97,11 @@ public class SearchFragment extends Fragment {
                         Log.e(TAG, "Invalid product id");
                         return;
                     }
+                    Log.d(TAG, productId);
                     for (String code : Countries.codes.keySet()) {
                         makeRequest("https://api.gog.com/products/" + productId + "/prices?countryCode=" + code + "&currency=USD");
                     }
-                    Log.d(TAG, productId);
+                    binding.priceRecyclerView.getAdapter().notifyDataSetChanged();
                 }, error -> Log.e(TAG, error.toString()));
         request.setTag(EXTRACT_PRODUCT_ID_REQUEST_TAG);
         requestQueue.add(request);
@@ -119,7 +118,6 @@ public class SearchFragment extends Fragment {
                         new PriceItem(url.split("countryCode=")[1].split("&")[0],
                                 Integer.parseInt(result.getString("finalPrice").split(" ")[0]) / 100.00));
 //                                result.getString("finalPrice").split(" ")[1]));
-                binding.priceRecyclerView.getAdapter().notifyDataSetChanged();
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
