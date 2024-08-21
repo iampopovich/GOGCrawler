@@ -47,7 +47,6 @@ public class SearchFragment extends Fragment {
         requestQueue = Volley.newRequestQueue(requireContext());
 
         binding = FragmentSearchBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
         binding.searchView.clearFocus();
         binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -55,7 +54,6 @@ public class SearchFragment extends Fragment {
                 fetchPrices(query);
                 return true;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 return false;
@@ -67,10 +65,9 @@ public class SearchFragment extends Fragment {
                 handleSendText(intent, binding.searchView);
             }
         }
-
         binding.priceRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.priceRecyclerView.setAdapter(new PriceAdapter(getContext(), searchViewModel.getPriceList()));
-        return root;
+        return binding.getRoot();
     }
 
     @Override
@@ -94,8 +91,7 @@ public class SearchFragment extends Fragment {
     private void extractProductId(String url) {
         StringRequest request = new StringRequest(url,
                 response -> {
-                    String regex = "card-product=\"(\\d+)\"";
-                    Pattern pattern = Pattern.compile(regex);
+                    Pattern pattern = Pattern.compile("card-product=\"(\\d+)\"");
                     Matcher matcher = pattern.matcher(response);
                     while (matcher.find()) productId = matcher.group(1);
                     if (productId == null) {

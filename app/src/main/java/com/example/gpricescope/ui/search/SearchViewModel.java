@@ -24,7 +24,7 @@ public class SearchViewModel extends ViewModel {
     }
 
     public void clearPrices() {
-        mPriceList.getValue().clear();
+        Objects.requireNonNull(mPriceList.getValue()).clear();
     }
 
     public List<PriceItem> getPriceList() {
