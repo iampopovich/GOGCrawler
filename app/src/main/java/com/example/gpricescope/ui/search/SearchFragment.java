@@ -1,5 +1,6 @@
 package com.example.gpricescope.ui.search;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,7 +55,7 @@ public class SearchFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                return false;
+                return true;
             }
         });
         Intent intent = requireActivity().getIntent();
@@ -81,8 +82,10 @@ public class SearchFragment extends Fragment {
         requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
         requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
         searchViewModel.clearPrices();
-        if (!query.startsWith("https://www.gog.com/"))
-            Toast.makeText(getContext(), "Invalid URL", Toast.LENGTH_SHORT).show();
+        if (!query.startsWith("https://www.gog.com/")) {
+            new AlertDialog.Builder(getContext()).setTitle("Invalid URL error").setMessage("Check if you entered correct URL").show();
+            return;
+        }
         extractProductId(query);
     }
 
@@ -93,7 +96,7 @@ public class SearchFragment extends Fragment {
                     Matcher matcher = pattern.matcher(response);
                     while (matcher.find()) productId = matcher.group(1);
                     if (productId == null) {
-                        Toast.makeText(getContext(), "Invalid product id", Toast.LENGTH_SHORT).show();
+                        new AlertDialog.Builder(getContext()).setTitle("Invalid product id").setMessage("Check if you entered correct URL").show();
                         Log.e(TAG, "Invalid product id");
                         return;
                     }
@@ -130,7 +133,7 @@ public class SearchFragment extends Fragment {
     private void handleSendText(Intent intent, SearchView searchView) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null && sharedText.startsWith("https://www.gog.com/") && sharedText.contains("/game/")) {
-            searchView.setQuery(sharedText, true);
+            searchView.setQuery(sharedText, false);
             fetchPrices(sharedText);
         }
     }
