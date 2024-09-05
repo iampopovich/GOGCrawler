@@ -1,4 +1,4 @@
-package com.example.gpricescope.ui.search;
+package com.example.gpricescope;
 
 public class PriceItem {
 

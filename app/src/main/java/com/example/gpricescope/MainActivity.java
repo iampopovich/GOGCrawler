@@ -1,39 +1,148 @@
 package com.example.gpricescope;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import android.util.Log;
+import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.gpricescope.databinding.ActivityMainBinding;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private RequestQueue requestQueue;
+    private String productId;
+    private SearchViewModel searchViewModel;
+    private final String TAG = "SearchFragment";
+    private final String FETCH_PRICE_REQUEST_TAG = "fetch_price_request";
+    private final String EXTRACT_PRODUCT_ID_REQUEST_TAG = "extract_product_id_request";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_search,
-                R.id.navigation_dashboard,
-                R.id.navigation_notifications)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
+        searchViewModel.getPriceList().observe(this, priceList -> {
+            binding.priceRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            binding.priceRecyclerView.setAdapter(new PriceAdapter(this, priceList));
+        });
+
+        requestQueue = Volley.newRequestQueue(this);
+
+        binding.searchView.clearFocus();
+        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                fetchPrices(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return true;
+            }
+        });
+        Intent intent = this.getIntent();
+        if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
+            if ("text/plain".equals(intent.getType())) {
+                handleSendText(intent, binding.searchView);
+            }
+        }
     }
 
+
+    private void fetchPrices(String query) {
+        requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
+        requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
+        searchViewModel.clearPrices();
+        if (!query.startsWith("https://www.gog.com/")) {
+            new AlertDialog.Builder(this).setTitle("Invalid URL error").setMessage("Check if you entered correct URL").show();
+            return;
+        }
+        extractProductId(query);
+    }
+
+    private void extractProductId(String url) {
+        StringRequest request = new StringRequest(url,
+                response -> {
+                    Pattern pattern = Pattern.compile("card-product=\"(\\d+)\"");
+                    Matcher matcher = pattern.matcher(response);
+                    while (matcher.find()) productId = matcher.group(1);
+                    if (productId == null) {
+                        new AlertDialog.Builder(this).setTitle("Invalid product id").setMessage("Check if you entered correct URL").show();
+                        Log.e(TAG, "Invalid product id");
+                        return;
+                    }
+                    Log.d(TAG, productId);
+                    for (String code : Countries.codes.keySet()) {
+                        makeRequest("https://api.gog.com/products/" + productId + "/prices?countryCode=" + code + "&currency=USD");
+                    }
+                }, error -> Log.e(TAG, error.toString()));
+        request.setTag(EXTRACT_PRODUCT_ID_REQUEST_TAG);
+        requestQueue.add(request);
+    }
+
+    private void makeRequest(String url) {
+        StringRequest request = new StringRequest(Request.Method.GET, url, response -> {
+            try {
+                JSONObject result = new JSONObject(response)
+                        .getJSONObject("_embedded")
+                        .getJSONArray("prices")
+                        .getJSONObject(0);
+                searchViewModel.addPrice(
+                        new PriceItem(
+                                url.split("countryCode=")[1].split("&")[0],
+                                Integer.parseInt(result.getString("finalPrice").split(" ")[0]) / 100.00
+                        ));
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }, error -> {
+        });
+        request.setTag(FETCH_PRICE_REQUEST_TAG);
+        requestQueue.add(request);
+    }
+
+    private void handleSendText(Intent intent, SearchView searchView) {
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (sharedText != null && sharedText.startsWith("https://www.gog.com/") && sharedText.contains("/game/")) {
+            searchView.setQuery(sharedText, false);
+            fetchPrices(sharedText);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        requestQueue.stop();
+        requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
+        requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
+    }
 }
