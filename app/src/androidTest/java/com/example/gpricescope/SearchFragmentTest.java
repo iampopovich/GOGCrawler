@@ -2,7 +2,6 @@ package com.example.gpricescope;
 
 import static androidx.test.espresso.Espresso.onIdle;
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.pressKey;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.PositionAssertions.isCompletelyAbove;
@@ -38,19 +37,16 @@ public class SearchFragmentTest {
 
     @Test
     public void searchViewIsAboveRecyclerView() {
-        onView(withId(R.id.navigation_search)).perform(click());
         onView(withId(R.id.searchView)).check(isCompletelyAbove(withId(R.id.priceRecyclerView)));
     }
 
     @Test
     public void recyclerViewIsBelowSearchView() {
-        onView(withId(R.id.navigation_search)).perform(click());
         onView(withId(R.id.priceRecyclerView)).check(isCompletelyBelow(withId(R.id.searchView)));
     }
 
     @Test
     public void searchPriceForExistingProduct() {
-        onView(withId(R.id.navigation_search)).perform(click());
         onView(withId(R.id.searchView)).perform(typeText("https://www.gog.com/en/game/cyberpunk_2077"));
         onView(withId(R.id.searchView)).perform(pressKey(KeyEvent.KEYCODE_ENTER));
         onView(withId(R.id.priceRecyclerView)).check(matches(isDisplayed()));
@@ -68,7 +64,6 @@ public class SearchFragmentTest {
 
     @Test
     public void searchPriceForNonExistingProduct() {
-        onView(withId(R.id.navigation_search)).perform(click());
         onView(withId(R.id.searchView)).perform(typeText("https://www.gog.com/en/game/cyberpukk_2088"));
         onView(withId(R.id.searchView)).perform(pressKey(KeyEvent.KEYCODE_ENTER));
         onView(withId(R.id.priceRecyclerView)).check(matches(isDisplayed()));
@@ -86,8 +81,7 @@ public class SearchFragmentTest {
 
     @Test
     public void searchPriceForInvalidUrl() {
-        onView(withId(R.id.navigation_search)).perform(click());
-        onView(withId(R.id.searchView)).perform(typeText("hpps://www.gog.com/en/game/cyberpunk_2077"));
+        onView(withId(R.id.searchView)).perform(typeText("hippo://www.gog.com/en/game/cyberpunk_2077"));
         onView(withId(R.id.searchView)).perform(pressKey(KeyEvent.KEYCODE_ENTER));
         onView(withText("Invalid URL error")).inRoot(isDialog()).check(matches(isDisplayed()));
 
