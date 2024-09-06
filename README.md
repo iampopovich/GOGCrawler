@@ -1,5 +1,7 @@
 # GOG-global-prices
 
+![Screenshot_20240907_012710](https://github.com/user-attachments/assets/d561b941-26ec-4c0b-aab0-b9af014a2d1c)
+
 ## Overview
 
 This Android app allows users to fetch and compare product prices from various countries using the GOG API.  
