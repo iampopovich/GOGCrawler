@@ -35,7 +35,7 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.glide)
     implementation(libs.volley)
     implementation(libs.appcompat)
     implementation(libs.material)

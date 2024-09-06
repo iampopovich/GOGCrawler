@@ -17,6 +17,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.example.gpricescope.databinding.ActivityMainBinding;
 
 import org.json.JSONException;
@@ -86,24 +87,31 @@ public class MainActivity extends AppCompatActivity {
             new AlertDialog.Builder(this).setTitle("Invalid URL error").setMessage("Check if you entered correct URL").show();
             return;
         }
-        extractProductId(query);
+        extractProductData(query);
     }
 
-    private void extractProductId(String url) {
+    private void extractProductData(String url) {
+
         StringRequest request = new StringRequest(url,
                 response -> {
-                    Pattern pattern = Pattern.compile("card-product=\"(\\d+)\"");
-                    Matcher matcher = pattern.matcher(response);
-                    while (matcher.find()) productId = matcher.group(1);
+                    Pattern idPattern = Pattern.compile("card-product=\"(\\d+)\"");
+                    Matcher idMatcher = idPattern.matcher(response);
+                    while (idMatcher.find()) productId = idMatcher.group(1);
                     if (productId == null) {
                         new AlertDialog.Builder(this).setTitle("Invalid product id").setMessage("Check if you entered correct URL").show();
                         Log.e(TAG, "Invalid product id");
                         return;
                     }
+                    Pattern imgPattern = Pattern.compile("https://images\\.gog-statics\\.com/[^\\s,]+_product_card_v2_logo[^\\s,]+");
+                    Matcher imgMatcher = imgPattern.matcher(response);
+                    if (imgMatcher.find()) {
+                        Glide.with(this).load(imgMatcher.group(0)).into(binding.imageView);
+                    }
                     Log.d(TAG, productId);
                     for (String code : Countries.codes.keySet()) {
                         makeRequest("https://api.gog.com/products/" + productId + "/prices?countryCode=" + code + "&currency=USD");
                     }
+
                 }, error -> Log.e(TAG, error.toString()));
         request.setTag(EXTRACT_PRODUCT_ID_REQUEST_TAG);
         requestQueue.add(request);
@@ -145,4 +153,5 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
         requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
     }
+
 }
