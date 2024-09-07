@@ -30,7 +30,7 @@ import java.util.Objects;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(AndroidJUnit4.class)
-public class SearchFragmentTest {
+public class SearchActivityTest {
 
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule = new ActivityScenarioRule<>(MainActivity.class);
@@ -89,11 +89,13 @@ public class SearchFragmentTest {
 
     @Test
     public void searchPriceForEmptyUrl() {
-
+        onView(withId(R.id.searchView)).perform(typeText(""));
+        onView(withId(R.id.searchView)).perform(pressKey(KeyEvent.KEYCODE_ENTER));
+        onView(withText("Invalid URL error")).inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
     @Test
-    public void clearSearchResult() {
+    public void clearSearchResult(){
     }
 
 }
