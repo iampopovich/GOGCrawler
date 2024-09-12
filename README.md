@@ -1,4 +1,4 @@
-# GOG-global-prices
+# GOGCrawler
 
 ![Screenshot_20240907_012710](https://github.com/user-attachments/assets/d561b941-26ec-4c0b-aab0-b9af014a2d1c)
 
