@@ -1,4 +1,4 @@
-package com.example.gpricescope;
+package com.example.gogcrawler;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -18,7 +18,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
-import com.example.gpricescope.databinding.ActivityMainBinding;
+import com.example.gogcrawler.databinding.ActivityMainBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;

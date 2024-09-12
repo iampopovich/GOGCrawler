@@ -1,4 +1,4 @@
-package com.example.gpricescope;
+package com.example.gogcrawler;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;

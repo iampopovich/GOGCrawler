@@ -1,4 +1,4 @@
-package com.example.gpricescope;
+package com.example.gogcrawler;
 
 import android.view.LayoutInflater;
 import android.view.View;

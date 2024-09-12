@@ -19,7 +19,7 @@ Install the app: Download and install the APK on your Android device.
 Enter the Product URL: Input the GOG product URL in the app.  
 View Prices: See the product prices across various countries, with the option to normalize to USD.
 Copy and paste game's url from GOG. e.g. you can paste url https://www.gog.com/en/game/cyberpunk_2077
-Or you can share url from mobile browser or whatever else app to GPriceScope
+Or you can share url from mobile browser or whatever else app to GOGCrawler
 
 ## Installation
 - Clone the repository: `git clone https://github.com/yourusername/price-comparator-app.git`

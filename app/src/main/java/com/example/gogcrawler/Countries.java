@@ -1,4 +1,4 @@
-package com.example.gpricescope;
+package com.example.gogcrawler;
 
 import java.util.HashMap;
 

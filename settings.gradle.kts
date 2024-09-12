@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "GPriceScope"
+rootProject.name = "GOGCrawler"
 include(":app")

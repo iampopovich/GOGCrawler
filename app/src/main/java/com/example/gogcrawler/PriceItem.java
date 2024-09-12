@@ -1,4 +1,4 @@
-package com.example.gpricescope;
+package com.example.gogcrawler;
 import java.text.DecimalFormat;
 
 public class PriceItem {
