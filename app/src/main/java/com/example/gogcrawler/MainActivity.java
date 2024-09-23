@@ -5,21 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.SearchView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.gogcrawler.databinding.ActivityMainBinding;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,14 +25,13 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String TAG = "SearchFragment";
+    private final String FETCH_PRICE_REQUEST_TAG = "fetch_price_request";
+    private final String EXTRACT_PRODUCT_ID_REQUEST_TAG = "extract_product_id_request";
     private ActivityMainBinding binding;
     private RequestQueue requestQueue;
     private String productId;
     private SearchViewModel searchViewModel;
-    private final String TAG = "SearchFragment";
-    private final String FETCH_PRICE_REQUEST_TAG = "fetch_price_request";
-    private final String EXTRACT_PRODUCT_ID_REQUEST_TAG = "extract_product_id_request";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

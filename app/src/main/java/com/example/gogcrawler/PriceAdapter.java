@@ -1,12 +1,10 @@
 package com.example.gogcrawler;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.content.Context;
 import android.widget.TextView;
-
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,4 +49,5 @@ public class PriceAdapter extends RecyclerView.Adapter<PriceAdapter.ViewHolder> 
             countryTextView = itemView.findViewById(R.id.countryTextView);
             priceTextView = itemView.findViewById(R.id.priceTextView);
         }
-    }}
+    }
+}

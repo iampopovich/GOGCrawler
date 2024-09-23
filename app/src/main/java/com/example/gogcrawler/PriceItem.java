@@ -1,12 +1,13 @@
 package com.example.gogcrawler;
+
 import java.text.DecimalFormat;
 
 public class PriceItem {
 
 
+    private final static Countries country = new Countries();
     private final String code;
     private final Double value;
-    private final static Countries country = new Countries();
 
     public PriceItem(String code, Double value) {
         this.code = code;

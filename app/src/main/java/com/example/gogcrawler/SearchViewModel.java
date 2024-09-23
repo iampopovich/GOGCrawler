@@ -11,6 +11,7 @@ import java.util.Objects;
 public class SearchViewModel extends ViewModel {
 
     private final MutableLiveData<List<PriceItem>> mPriceList;
+    private final int limit = 7;
 
     public SearchViewModel() {
         mPriceList = new MutableLiveData<>(new ArrayList<>());
@@ -20,7 +21,7 @@ public class SearchViewModel extends ViewModel {
         List<PriceItem> list = mPriceList.getValue();
         Objects.requireNonNull(list).add(priceItem);
         list.sort(Comparator.comparing(PriceItem::getValue));
-        if (list.size() > 7) list.subList(7, list.size()).clear();
+        if (list.size() > limit) list.subList(limit, list.size()).clear();
         mPriceList.setValue(list);
     }
 
