@@ -4,25 +4,24 @@ import java.text.DecimalFormat;
 
 public class PriceItem {
 
+  private static final Countries country = new Countries();
+  private final String code;
+  private final Double value;
 
-    private final static Countries country = new Countries();
-    private final String code;
-    private final Double value;
+  public PriceItem(String code, Double value) {
+    this.code = code;
+    this.value = value;
+  }
 
-    public PriceItem(String code, Double value) {
-        this.code = code;
-        this.value = value;
-    }
+  public String getCountry() {
+    return country.getCountry(code);
+  }
 
-    public String getCountry() {
-        return country.getCountry(code);
-    }
+  public Double getValue() {
+    return value;
+  }
 
-    public Double getValue() {
-        return value;
-    }
-
-    public String getPrice() {
-        return new DecimalFormat("#.## USD").format(value);
-    }
+  public String getPrice() {
+    return new DecimalFormat("#.## USD").format(value);
+  }
 }
