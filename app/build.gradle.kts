@@ -32,6 +32,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    lint {
+        abortOnError = true
+        checkReleaseBuilds = true
+        htmlReport = true
+        htmlOutput = file("$buildDir/reports/lint-report.html")
+    }
 }
 
 dependencies {
