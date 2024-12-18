@@ -5,19 +5,20 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 
-public class GOGImagesSource {
-    private static final String TAG = "GOGImagesSource";
-    private static final String BASE_URL = "https://www.gog.com/game/";
+public class GOGPriceSource {
+    private static final String TAG = "GOGPriceSource";
+    private static final String BASE_URL = "https://api.gog.com/products/";
     private final RequestQueue requestQueue;
 
-    public GOGImagesSource(RequestQueue requestQueue) {
+    public GOGPriceSource(RequestQueue requestQueue) {
         this.requestQueue = requestQueue;
     }
 
-    public void fetchImageData(String productId,
-                               Response.Listener<String> successListener,
-                               Response.ErrorListener errorListener) {
-        String url = BASE_URL + productId;
+    public void fetchPrice(String productId, 
+                         String countryCode,
+                         Response.Listener<String> successListener,
+                         Response.ErrorListener errorListener) {
+        String url = BASE_URL + productId + "/prices?countryCode=" + countryCode + "&currency=USD";
         StringRequest request = new StringRequest(
                 Request.Method.GET,
                 url,

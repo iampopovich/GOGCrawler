@@ -15,10 +15,10 @@ public class ImageRepository {
         this.imageSource = new GOGImagesSource(requestQueue);
     }
 
-    public void extractImageUrl(String htmlContent,
+    public void extractImageUrl(String productId,
                                 OnImageExtractedListener listener) {
         imageSource.fetchImageData(
-                htmlContent,
+                productId,
                 response -> {
                     Matcher imgMatcher = IMG_PATTERN.matcher(response);
                     String imageUrl = imgMatcher.find() ? imgMatcher.group(0) : null;
@@ -26,6 +26,10 @@ public class ImageRepository {
                 },
                 error -> listener.onError(error.getMessage())
         );
+    }
+
+    public void cancelRequests() {
+        imageSource.cancelRequests();
     }
 
     public interface OnImageExtractedListener {

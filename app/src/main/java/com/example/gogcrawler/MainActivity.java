@@ -13,30 +13,27 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.example.gogcrawler.data.ProductData;
+import com.example.gogcrawler.data.PriceData;
 import com.example.gogcrawler.databinding.ActivityMainBinding;
 import com.example.gogcrawler.repositories.ImageRepository;
+import com.example.gogcrawler.repositories.PriceRepository;
 import com.example.gogcrawler.repositories.ProductRepository;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getName();
-    private static final String FETCH_PRICE_REQUEST_TAG = "FETCH_PRICE";
-    private static final String EXTRACT_PRODUCT_ID_REQUEST_TAG = "EXTRACT_PRODUCT_ID";
     private ActivityMainBinding binding;
     private RequestQueue requestQueue;
     private SearchViewModel searchViewModel;
     private ImageRepository imageRepository;
     private ProductRepository productRepository;
-    private String productId;
+    private PriceRepository priceRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
         imageRepository = new ImageRepository(requestQueue);
         productRepository = new ProductRepository(requestQueue);
+        priceRepository = new PriceRepository(requestQueue);
 
         binding.searchView.clearFocus();
         binding.searchView.setOnQueryTextListener(
@@ -89,17 +87,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchPrices(String query) {
-        requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
-        requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
         searchViewModel.clearPrices();
 
         productRepository.extractProductData(query, new ProductRepository.OnProductExtractedListener() {
             @Override
             public void onProductExtracted(ProductData productData) {
-                productId = productData.getId();
-
                 // Получаем изображение
-                imageRepository.extractImageUrl(query, new ImageRepository.OnImageExtractedListener() {
+                imageRepository.extractImageUrl(productData.getId(), new ImageRepository.OnImageExtractedListener() {
                     @Override
                     public void onImageExtracted(String imageUrl) {
                         if (imageUrl != null) {
@@ -114,14 +108,17 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 // Запрашиваем цены
-                for (String code : Countries.codes.keySet()) {
-                    makeRequest(
-                            "https://api.gog.com/products/"
-                                    + productId
-                                    + "/prices?countryCode="
-                                    + code
-                                    + "&currency=USD");
-                }
+                priceRepository.fetchPrices(productData.getId(), new PriceRepository.OnPricesUpdatedListener() {
+                    @Override
+                    public void onPricesUpdated(List<PriceData> prices) {
+                        searchViewModel.updatePrices(prices);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Log.e(TAG, "Error fetching prices: " + error);
+                    }
+                });
             }
 
             @Override
@@ -132,32 +129,6 @@ public class MainActivity extends AppCompatActivity {
                         .show();
             }
         });
-    }
-
-    private void makeRequest(String url) {
-        StringRequest request =
-                new StringRequest(
-                        Request.Method.GET,
-                        url,
-                        response -> {
-                            try {
-                                JSONObject result =
-                                        new JSONObject(response)
-                                                .getJSONObject("_embedded")
-                                                .getJSONArray("prices")
-                                                .getJSONObject(0);
-                                searchViewModel.addPrice(
-                                        new PriceItem(
-                                                url.split("countryCode=")[1].split("&")[0],
-                                                Integer.parseInt(result.getString("finalPrice").split(" ")[0]) / 100.00));
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
-                            }
-                        },
-                        error -> {
-                        });
-        request.setTag(FETCH_PRICE_REQUEST_TAG);
-        requestQueue.add(request);
     }
 
     private void handleSendText(Intent intent, SearchView searchView) {
@@ -174,8 +145,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         requestQueue.stop();
-        requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
-        requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
         productRepository.cancelRequests();
+        imageRepository.cancelRequests();
+        priceRepository.cancelRequests();
     }
 }
