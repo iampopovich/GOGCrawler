@@ -9,16 +9,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PriceAdapter extends RecyclerView.Adapter<PriceAdapter.ViewHolder> {
 
-    private final List<PriceItem> priceList;
     private final Context context;
+    private List<PriceItem> priceList;
 
     public PriceAdapter(Context context, List<PriceItem> priceList) {
-        this.priceList = priceList;
+        this.priceList = priceList != null ? priceList : new ArrayList<>();
         this.context = context;
+    }
+
+    public void setPrices(List<PriceItem> newPrices) {
+        this.priceList = newPrices != null ? newPrices : new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     @NonNull

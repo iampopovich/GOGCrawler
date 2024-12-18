@@ -14,10 +14,10 @@ public class GOGPriceSource {
         this.requestQueue = requestQueue;
     }
 
-    public void fetchPrice(String productId, 
-                         String countryCode,
-                         Response.Listener<String> successListener,
-                         Response.ErrorListener errorListener) {
+    public void fetchPrice(String productId,
+                           String countryCode,
+                           Response.Listener<String> successListener,
+                           Response.ErrorListener errorListener) {
         String url = BASE_URL + productId + "/prices?countryCode=" + countryCode + "&currency=USD";
         StringRequest request = new StringRequest(
                 Request.Method.GET,

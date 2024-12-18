@@ -16,14 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
-import com.example.gogcrawler.data.ProductData;
 import com.example.gogcrawler.data.PriceData;
+import com.example.gogcrawler.data.ProductData;
 import com.example.gogcrawler.databinding.ActivityMainBinding;
 import com.example.gogcrawler.repositories.ImageRepository;
 import com.example.gogcrawler.repositories.PriceRepository;
 import com.example.gogcrawler.repositories.ProductRepository;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -108,15 +106,15 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 // Запрашиваем цены
-                priceRepository.fetchPrices(productData.getId(), new PriceRepository.OnPricesUpdatedListener() {
+                priceRepository.fetchPrices(productData.getId(), new PriceRepository.OnPriceListener() {
                     @Override
-                    public void onPricesUpdated(List<PriceData> prices) {
-                        searchViewModel.updatePrices(prices);
+                    public void onPriceReceived(PriceData price) {
+                        searchViewModel.addPrice(price);
                     }
 
                     @Override
                     public void onError(String error) {
-                        Log.e(TAG, "Error fetching prices: " + error);
+                        Log.e(TAG, "Error fetching price: " + error);
                     }
                 });
             }

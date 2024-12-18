@@ -65,12 +65,46 @@ public class PriceRepository {
         }
     }
 
+    public void fetchPrices(String productId, OnPriceListener listener) {
+        for (String countryCode : Countries.codes.keySet()) {
+            priceSource.fetchPrice(
+                    productId,
+                    countryCode,
+                    response -> {
+                        try {
+                            JSONObject result = new JSONObject(response)
+                                    .getJSONObject("_embedded")
+                                    .getJSONArray("prices")
+                                    .getJSONObject(0);
+
+                            String[] priceParts = result.getString("finalPrice").split(" ");
+                            double price = Integer.parseInt(priceParts[0]) / 100.00;
+                            String currency = priceParts.length > 1 ? priceParts[1] : "USD";
+
+                            PriceData priceData = new PriceData(countryCode, price, currency);
+                            listener.onPriceReceived(priceData);
+                        } catch (JSONException e) {
+                            listener.onError("Error parsing price data: " + e.getMessage());
+                        }
+                    },
+                    error -> listener.onError("Error fetching price: " + error.getMessage())
+            );
+        }
+    }
+
     public void cancelRequests() {
         priceSource.cancelRequests();
     }
 
     public interface OnPricesUpdatedListener {
         void onPricesUpdated(List<PriceData> prices);
+
+        void onError(String error);
+    }
+
+    public interface OnPriceListener {
+        void onPriceReceived(PriceData price);
+
         void onError(String error);
     }
 }
