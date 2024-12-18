@@ -18,14 +18,13 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.example.gogcrawler.data.ProductData;
 import com.example.gogcrawler.databinding.ActivityMainBinding;
 import com.example.gogcrawler.repositories.ImageRepository;
+import com.example.gogcrawler.repositories.ProductRepository;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private SearchViewModel searchViewModel;
     private ImageRepository imageRepository;
+    private ProductRepository productRepository;
     private String productId;
 
     @Override
@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
                         });
 
         requestQueue = Volley.newRequestQueue(this);
+        imageRepository = new ImageRepository(requestQueue);
+        productRepository = new ProductRepository(requestQueue);
 
         binding.searchView.clearFocus();
         binding.searchView.setOnQueryTextListener(
@@ -84,68 +86,52 @@ public class MainActivity extends AppCompatActivity {
                 handleSendText(intent, binding.searchView);
             }
         }
-
-        imageRepository = new ImageRepository(requestQueue);
     }
 
     private void fetchPrices(String query) {
         requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
         requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
         searchViewModel.clearPrices();
-        if (!query.startsWith("https://www.gog.com/")) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Invalid URL error")
-                    .setMessage("Check if you entered correct URL")
-                    .show();
-            return;
-        }
-        extractProductData(query);
-    }
 
-    private void extractProductData(String url) {
-        StringRequest request =
-                new StringRequest(
-                        url,
-                        response -> {
-                            Pattern idPattern = Pattern.compile("card-product=\"(\\d+)\"");
-                            Matcher idMatcher = idPattern.matcher(response);
-                            while (idMatcher.find()) productId = idMatcher.group(1);
-                            if (productId == null) {
-                                new AlertDialog.Builder(this)
-                                        .setTitle("Invalid product id")
-                                        .setMessage("Check if you entered correct URL")
-                                        .show();
-                                Log.e(TAG, "Invalid product id");
-                                return;
-                            }
+        productRepository.extractProductData(query, new ProductRepository.OnProductExtractedListener() {
+            @Override
+            public void onProductExtracted(ProductData productData) {
+                productId = productData.getId();
 
-                            imageRepository.extractImageUrl(response, new ImageRepository.OnImageExtractedListener() {
-                                @Override
-                                public void onImageExtracted(String imageUrl) {
-                                    if (imageUrl != null) {
-                                        Glide.with(MainActivity.this).load(imageUrl).into(binding.imageView);
-                                    }
-                                }
+                // Получаем изображение
+                imageRepository.extractImageUrl(query, new ImageRepository.OnImageExtractedListener() {
+                    @Override
+                    public void onImageExtracted(String imageUrl) {
+                        if (imageUrl != null) {
+                            Glide.with(MainActivity.this).load(imageUrl).into(binding.imageView);
+                        }
+                    }
 
-                                @Override
-                                public void onError(String error) {
-                                    Log.e(TAG, "Error extracting image: " + error);
-                                }
-                            });
+                    @Override
+                    public void onError(String error) {
+                        Log.e(TAG, "Error extracting image: " + error);
+                    }
+                });
 
-                            Log.d(TAG, productId);
-                            for (String code : Countries.codes.keySet()) {
-                                makeRequest(
-                                        "https://api.gog.com/products/"
-                                                + productId
-                                                + "/prices?countryCode="
-                                                + code
-                                                + "&currency=USD");
-                            }
-                        },
-                        error -> Log.e(TAG, error.toString()));
-        request.setTag(EXTRACT_PRODUCT_ID_REQUEST_TAG);
-        requestQueue.add(request);
+                // Запрашиваем цены
+                for (String code : Countries.codes.keySet()) {
+                    makeRequest(
+                            "https://api.gog.com/products/"
+                                    + productId
+                                    + "/prices?countryCode="
+                                    + code
+                                    + "&currency=USD");
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Error")
+                        .setMessage(error)
+                        .show();
+            }
+        });
     }
 
     private void makeRequest(String url) {
@@ -190,5 +176,6 @@ public class MainActivity extends AppCompatActivity {
         requestQueue.stop();
         requestQueue.cancelAll(FETCH_PRICE_REQUEST_TAG);
         requestQueue.cancelAll(EXTRACT_PRODUCT_ID_REQUEST_TAG);
+        productRepository.cancelRequests();
     }
 }
