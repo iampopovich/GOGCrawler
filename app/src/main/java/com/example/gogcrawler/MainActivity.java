@@ -128,14 +128,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+//todo: handleSendText not implemented yet
     private void handleSendText(Intent intent, SearchView searchView) {
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null
                 && sharedText.startsWith("https://www.gog.com/")
                 && sharedText.contains("/game/")) {
             searchView.setQuery(sharedText, false);
-            fetchPrices(sharedText);
+//            fetchPrices(sharedText);
         }
     }
 

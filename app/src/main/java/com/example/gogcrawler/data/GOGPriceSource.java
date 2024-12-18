@@ -1,5 +1,7 @@
 package com.example.gogcrawler.data;
 
+import android.util.Log;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -19,6 +21,7 @@ public class GOGPriceSource {
                            Response.Listener<String> successListener,
                            Response.ErrorListener errorListener) {
         String url = BASE_URL + productId + "/prices?countryCode=" + countryCode + "&currency=USD";
+        Log.d(TAG, "Fetching price from: " + url);
         StringRequest request = new StringRequest(
                 Request.Method.GET,
                 url,
