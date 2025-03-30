@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.gpricescope"
+    namespace = "com.example.gogcrawler"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.gpricescope"
+        applicationId = "com.example.gogcrawler"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
