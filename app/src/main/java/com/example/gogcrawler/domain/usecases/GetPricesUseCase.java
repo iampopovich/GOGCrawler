@@ -7,7 +7,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.gogcrawler.data.models.PriceModel;
-import com.example.gogcrawler.utils.Countries;
+import com.example.gogcrawler.data.models.Countries;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Comparator;

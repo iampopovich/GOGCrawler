@@ -1,7 +1,5 @@
 package com.example.gogcrawler.data.models;
 
-import com.example.gogcrawler.utils.Countries;
-
 public class PriceModel {
     private final String code;
     private final Double value;
