@@ -1,27 +1,29 @@
-package com.example.gpricescope;
+package com.example.gogcrawler.ui.main;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.content.Context;
 import android.widget.TextView;
-
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.example.gogcrawler.R;
+import com.example.gogcrawler.data.models.PriceModel;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PriceAdapter extends RecyclerView.Adapter<PriceAdapter.ViewHolder> {
-
-
-    private final List<PriceItem> priceList;
+    private List<PriceModel> priceList;
     private final Context context;
 
-
-    public PriceAdapter(Context context, List<PriceItem> priceList) {
-        this.priceList = priceList;
+    public PriceAdapter(Context context, List<PriceModel> priceList) {
         this.context = context;
+        this.priceList = priceList != null ? priceList : new ArrayList<>();
+    }
+
+    public void updatePrices(List<PriceModel> newPrices) {
+        this.priceList = newPrices != null ? newPrices : new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -32,9 +34,9 @@ public class PriceAdapter extends RecyclerView.Adapter<PriceAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull PriceAdapter.ViewHolder holder, int position) {
-        PriceItem item = priceList.get(position);
+        PriceModel item = priceList.get(position);
         holder.countryTextView.setText(item.getCountry());
-        holder.priceTextView.setText(item.getPrice());
+        holder.priceTextView.setText(item.getFormattedPrice());
     }
 
     @Override
@@ -51,4 +53,5 @@ public class PriceAdapter extends RecyclerView.Adapter<PriceAdapter.ViewHolder> 
             countryTextView = itemView.findViewById(R.id.countryTextView);
             priceTextView = itemView.findViewById(R.id.priceTextView);
         }
-    }}
+    }
+}

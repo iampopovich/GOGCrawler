@@ -1,12 +1,10 @@
-package com.example.gpricescope;
+package com.example.gogcrawler.data.models;
+
 import java.text.DecimalFormat;
 
 public class PriceItem {
-
-
     private final String code;
     private final Double value;
-    private final static Countries country = new Countries();
 
     public PriceItem(String code, Double value) {
         this.code = code;
@@ -14,7 +12,7 @@ public class PriceItem {
     }
 
     public String getCountry() {
-        return country.getCountry(code);
+        return Countries.codes.get(code);
     }
 
     public Double getValue() {

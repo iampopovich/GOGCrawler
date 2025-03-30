@@ -1,10 +1,11 @@
-package com.example.gpricescope;
+package com.example.gogcrawler.utils;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Countries {
-    public static final HashMap<String, String> codes = new HashMap<>();
-
+    public static final Map<String, String> codes = new HashMap<>();
+    
     static {
         codes.put("US", "United States");
         codes.put("AR", "Argentina");
@@ -91,8 +92,7 @@ public class Countries {
         codes.put("AE", "United Arab Emirates");
     }
 
-    public String getCountry(String code) {
+    public static String getCountry(String code) {
         return codes.get(code);
     }
-
 }

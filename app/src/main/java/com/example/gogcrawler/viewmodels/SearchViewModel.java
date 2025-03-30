@@ -1,15 +1,14 @@
-package com.example.gpricescope;
+package com.example.gogcrawler.viewmodels;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
+import com.example.gogcrawler.data.models.PriceItem;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
 public class SearchViewModel extends ViewModel {
-
     private final MutableLiveData<List<PriceItem>> mPriceList;
 
     public SearchViewModel() {
