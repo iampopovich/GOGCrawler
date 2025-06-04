@@ -1,5 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
+}
+
+ktlint {
+    version.set("1.6.0")
+    // Add any other Ktlint configurations here
 }
 
 android {
@@ -32,6 +38,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+}
+
+tasks.register("ktlintCheck") {
+    dependsOn("ktlintFormat")
+    // This task will run ktlintFormat which includes check and format.
+    // If you only want to check, you can depend on "ktlintCheck" from the plugin,
+    // but since we usually want to format, depending on ktlintFormat is more practical.
 }
 
 dependencies {
