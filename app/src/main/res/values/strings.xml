@@ -3,4 +3,6 @@
     <string name="title_search">Search</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="content_desc_product_image">Product image</string>
+    <string name="error_dialog_title">Error</string>
 </resources>
